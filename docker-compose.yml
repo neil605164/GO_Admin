@@ -1,0 +1,18 @@
+version: '3.1'
+
+services:
+
+  goAdmindb:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: qwe1234
+      MYSQL_DATABASE: GoAdmin
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
