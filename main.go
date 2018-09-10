@@ -1,6 +1,7 @@
 package main
 
 import (
+	"GO_Admin/global"
 	route "GO_Admin/router"
 	"log"
 )
@@ -11,7 +12,7 @@ func init() {
 }
 
 func main() {
-
+	global.Start()
 	r := route.SetupRouter()
 
 	// Listen and Server in 0.0.0.0:8081

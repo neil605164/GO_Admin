@@ -1,7 +1,6 @@
 package global
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -9,7 +8,7 @@ import (
 )
 
 var configFile []byte
-var config DatabaseConfig
+var Config *DatabaseConfig
 
 func Start() {
 	var err error
@@ -19,12 +18,11 @@ func Start() {
 	}
 
 	// 塞值進入struct
-	config, err := GetConfigData()
+	Config, err = GetConfigData()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(config)
 }
 
 func GetConfigData() (db *DatabaseConfig, err error) {
