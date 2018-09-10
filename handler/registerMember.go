@@ -1,7 +1,8 @@
 package member
 
 import (
-	_ "GO_Admin/model"
+	"GO_Admin/model"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -19,7 +20,8 @@ type registerMemberResult struct {
 }
 
 func RegisterMember(c *gin.Context) {
-	// dbConn.DBConnect()
+	db := dbConn.DBConnect()
+	fmt.Println(db)
 
 	// 事先聲明defer,才可以抓到panic的值
 	// defer func() {
