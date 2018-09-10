@@ -1,53 +1,8 @@
 package dbConn
 
 import (
-	"fmt"
-	"io/ioutil"
-	"log"
-
 	_ "github.com/go-sql-driver/mysql"
-	yaml "gopkg.in/yaml.v2"
 )
-
-var configFile []byte
-
-// const (
-// 	host     = "localhost"
-// 	database = "GoAdmin"
-// 	user     = "root"
-// 	password = "qwe1234"
-// )
-
-type DatabaseConfig struct {
-	Database Dbconnect `yaml:"database"`
-}
-
-type Dbconnect struct {
-	Host     string `yaml:"host"`
-	Database string `yaml:"database"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-}
-
-func init() {
-	var err error
-	configFile, err = ioutil.ReadFile("conf/dev.yaml")
-	if err != nil {
-		log.Fatalf("yml file get err %v", err)
-	}
-
-	// 塞值進入struct
-	config, err := GetDBConfig()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(config)
-}
-
-func GetDBConfig() (db *DatabaseConfig, err error) {
-	err = yaml.Unmarshal(configFile, &db)
-	return db, err
-}
 
 // func DBConnect() {
 // 	// Initialize connection string.
