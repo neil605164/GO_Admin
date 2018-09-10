@@ -7,7 +7,6 @@ package gin
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"time"
 
@@ -119,11 +118,11 @@ func LoggerWithWriter(out io.Writer, notlogged ...string) HandlerFunc {
 
 func colorForStatus(code int) string {
 	switch {
-	case code >= http.StatusOK && code < http.StatusMultipleChoices:
+	case code >= 200 && code < 300:
 		return green
-	case code >= http.StatusMultipleChoices && code < http.StatusBadRequest:
+	case code >= 300 && code < 400:
 		return white
-	case code >= http.StatusBadRequest && code < http.StatusInternalServerError:
+	case code >= 400 && code < 500:
 		return yellow
 	default:
 		return red

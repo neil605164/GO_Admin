@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	host     = "goAdmindb"
+	host     = "localhost"
 	database = "GoAdmin"
 	user     = "root"
 	password = "qwe1234"
@@ -22,7 +22,7 @@ func checkError(err error) {
 
 func DBConnect() {
 	// Initialize connection string.
-	var connectionString = fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?allowNativePasswords=true", user, password, host, database)
+	var connectionString = fmt.Sprintf("%s:%s@tcp(%s:3307)/%s?allowNativePasswords=true", user, password, host, database)
 
 	// Initialize connection object.
 	db, err := sql.Open("mysql", connectionString)

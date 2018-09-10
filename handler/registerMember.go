@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"GO_Admin/conf"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +21,8 @@ type registerMemberResult struct {
 }
 
 func RegisterMember(c *gin.Context) {
+	dbConn.DBConnect()
+
 	// 事先聲明defer,才可以抓到panic的值
 	defer func() {
 		if err := recover(); err != nil {
