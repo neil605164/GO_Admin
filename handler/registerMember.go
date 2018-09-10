@@ -1,11 +1,9 @@
 package member
 
 import (
-	"fmt"
+	_ "GO_Admin/model"
 	"log"
 	"net/http"
-
-	"GO_Admin/conf"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,14 +19,14 @@ type registerMemberResult struct {
 }
 
 func RegisterMember(c *gin.Context) {
-	dbConn.DBConnect()
+	// dbConn.DBConnect()
 
 	// 事先聲明defer,才可以抓到panic的值
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println(err)
-		}
-	}()
+	// defer func() {
+	// 	if err := recover(); err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// }()
 
 	log.Println("=======Register Start=======:")
 
