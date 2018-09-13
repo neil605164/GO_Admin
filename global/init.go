@@ -8,7 +8,7 @@ import (
 )
 
 var configFile []byte
-var Config *DatabaseConfig
+var Config *DevConfig
 
 func Start() {
 	var err error
@@ -25,7 +25,7 @@ func Start() {
 
 }
 
-func GetConfigData() (db *DatabaseConfig, err error) {
+func GetConfigData() (db *DevConfig, err error) {
 	err = yaml.Unmarshal(configFile, &db)
 	return db, err
 }

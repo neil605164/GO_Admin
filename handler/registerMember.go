@@ -1,6 +1,7 @@
 package member
 
 import (
+	"GO_Admin/global"
 	"GO_Admin/model"
 	"fmt"
 	"log"
@@ -9,35 +10,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type registerMember struct {
-	Username string
-	Password string
-}
-
-type registerMemberResult struct {
-	Meta registerMember `json:"meta"`
-	Data interface{}    `json:"data"`
-}
-
 func RegisterMember(c *gin.Context) {
-	db := dbConn.DBConnect()
-	fmt.Println(db)
-
 	// 事先聲明defer,才可以抓到panic的值
-	// defer func() {
-	// 	if err := recover(); err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// }()
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+	}()
 
 	log.Println("=======Register Start=======:")
+	// get param start
+	registerMemberOption := &global.RegisterMemberOption{}
+	registerMemberOption.Username = c.PostForm("account")
+	registerMemberOption.Password = c.PostForm("password")
+	// get param ecd
 
-	registerMember := &registerMember{}
-	registerMember.Username = c.PostForm("account")
-	registerMember.Password = c.PostForm("password")
+	// execute db start
+	err := model.SQL_RegisterMem(registerMemberOption)
+	if err != nil {
+		fmt.Printf("=========%v=========", err)
+		c.JSON(http.StatusBadRequest, err)
+	}
+	// execute db end
 
-	registerMemberResult := &registerMemberResult{}
-	registerMemberResult.Meta = *registerMember
+	// compose param start
+	registerMemberResult := &global.RegisterMemberResult{}
+	registerMemberResult.Meta = *registerMemberOption
+	registerMemberResult.Data = "Access Register Member"
+	// compose param end
 
-	c.JSON(http.StatusOK, registerMemberResult)
+	c.JSON(http.StatusOK, *registerMemberResult)
 }
