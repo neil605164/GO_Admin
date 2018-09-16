@@ -10,14 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RegisterMember 註冊會員 start
 func RegisterMember(c *gin.Context) {
-	// 事先聲明defer,才可以抓到panic的值
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println(err)
-		}
-	}()
-
 	log.Println("=======Register Start=======:")
 	// get param start
 	registerMemberOption := &global.RegisterMemberOption{}
@@ -30,7 +24,7 @@ func RegisterMember(c *gin.Context) {
 	registerMemberResult.Meta = *registerMemberOption
 
 	// execute db start
-	err := model.SQL_RegisterMem(registerMemberOption)
+	err := model.SQLRegisterMem(registerMemberOption)
 	if err != nil {
 		registerMemberResult.Data = err
 		fmt.Printf("=========%v=========", err)

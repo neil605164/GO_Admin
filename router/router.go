@@ -1,15 +1,13 @@
 package route
 
 import (
-	"GO_Admin/handler"
+	"GO_Admin/handler/member"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
-	// Disable Console Color
-	// gin.DisableConsoleColor()
-	r := gin.Default()
+// SetupRouter 路由控制
+func SetupRouter(r *gin.Engine) {
 
 	// Authorized group (uses gin.BasicAuth() middleware)
 	// Same than:
@@ -27,6 +25,6 @@ func SetupRouter() *gin.Engine {
 
 	// 註冊會員
 	authorized.POST("/register_member", member.RegisterMember)
-
-	return r
+	// 取得會員清單
+	authorized.GET("/get_User_List", member.GetUserList)
 }

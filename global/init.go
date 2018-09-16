@@ -8,8 +8,11 @@ import (
 )
 
 var configFile []byte
+
+// Config 讀取dev.yaml檔案
 var Config *DevConfig
 
+// Start 執行main.go的第一步驟，載入設定檔
 func Start() {
 	var err error
 	configFile, err = ioutil.ReadFile("conf/dev.yaml")
@@ -18,14 +21,14 @@ func Start() {
 	}
 
 	// 塞值進入struct
-	Config, err = GetConfigData()
+	Config, err = getConfigData()
 	if err != nil {
 		panic(err)
 	}
 
 }
 
-func GetConfigData() (db *DevConfig, err error) {
+func getConfigData() (db *DevConfig, err error) {
 	err = yaml.Unmarshal(configFile, &db)
 	return db, err
 }

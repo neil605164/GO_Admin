@@ -1,11 +1,7 @@
 package model
 
-type db struct {
-	Title   string
-	Message string
-}
-
-type user struct {
+// User 定義 user table
+type User struct {
 	Username string `db:"username"`
 	Password string `db:"password"`
 	// CreatedAt time.Time `db:"createdat"`

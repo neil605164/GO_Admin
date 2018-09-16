@@ -27,11 +27,9 @@ func dbConnect() (db *gorm.DB) {
 	return db
 }
 
-/**
-* 註冊會員
- */
-func dbRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
-	user := user{
+// SQLRegisterMem 註冊會員
+func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
+	user := User{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
 		// CreatedAt: time.Now(),

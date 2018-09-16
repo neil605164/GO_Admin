@@ -4,6 +4,8 @@ import (
 	"GO_Admin/global"
 	route "GO_Admin/router"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 func init() {
@@ -12,9 +14,13 @@ func init() {
 }
 
 func main() {
+	// Disable Console Color
+	// gin.DisableConsoleColor()
+	r := gin.Default()
+
 	global.Start()
 
-	r := route.SetupRouter()
+	route.SetupRouter(r)
 
 	// Listen and Server in 0.0.0.0:8081
 	r.Run(":8081")
