@@ -25,17 +25,20 @@ func RegisterMember(c *gin.Context) {
 	registerMemberOption.Password = c.PostForm("password")
 	// get param ecd
 
-	// execute db start
-	err := model.SQL_RegisterMem(registerMemberOption)
-	if err != nil {
-		fmt.Printf("=========%v=========", err)
-		c.JSON(http.StatusBadRequest, err)
-	}
-	// execute db end
-
 	// compose param start
 	registerMemberResult := &global.RegisterMemberResult{}
 	registerMemberResult.Meta = *registerMemberOption
+
+	// execute db start
+	err := model.SQL_RegisterMem(registerMemberOption)
+	if err != nil {
+		registerMemberResult.Data = err
+		fmt.Printf("=========%v=========", err)
+		c.JSON(http.StatusOK, registerMemberResult)
+		return
+	}
+	// execute db end
+
 	registerMemberResult.Data = "Access Register Member"
 	// compose param end
 

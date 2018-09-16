@@ -56,10 +56,10 @@ func SQL_RegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 
 	err = db.Create(&user).Error
 	if err != nil {
-		// err = global.NewError{
-		// 	Title:   "Member is Exist",
-		// 	Message: fmt.Sprintf("%s member is exist, ErrorMsg is : %v", user.Username, err),
-		// }
+		err = global.NewError{
+			Title:   "Member is Exist",
+			Message: fmt.Sprintf("%s member is exist", user.Username),
+		}
 		return err
 	}
 	return nil
