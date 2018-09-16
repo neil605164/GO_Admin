@@ -5,14 +5,13 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 /**
 * 建立 DB 連線
 * @return db *gorm.DB gorm.DB 記憶體位置
  */
-func DBConnect() (db *gorm.DB) {
+func dbConnect() (db *gorm.DB) {
 	USER := global.Config.Database.User
 	PASSWORD := global.Config.Database.Password
 	HOST := global.Config.Database.Host
@@ -31,14 +30,14 @@ func DBConnect() (db *gorm.DB) {
 /**
 * 註冊會員
  */
-func SQL_RegisterMem(rgMem *global.RegisterMemberOption) (err error) {
-	user := User{
+func dbRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
+	user := user{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
 		// CreatedAt: time.Now(),
 	}
 
-	db := DBConnect()
+	db := dbConnect()
 
 	defer db.Close()
 

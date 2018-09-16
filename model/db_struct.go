@@ -1,11 +1,11 @@
 package model
 
-type DB struct {
+type db struct {
 	Title   string
 	Message string
 }
 
-type User struct {
+type user struct {
 	Username string `db:"username"`
 	Password string `db:"password"`
 	// CreatedAt time.Time `db:"createdat"`
