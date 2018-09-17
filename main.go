@@ -2,6 +2,7 @@ package main
 
 import (
 	"GO_Admin/global"
+	"GO_Admin/model"
 	route "GO_Admin/router"
 	"log"
 
@@ -18,8 +19,11 @@ func main() {
 	// gin.DisableConsoleColor()
 	r := gin.Default()
 
+	// 載入環境設定
 	global.Start()
-
+	// 檢查DB Table 是否存在
+	model.CheckTableIsExist()
+	// 載入router設定
 	route.SetupRouter(r)
 
 	// Listen and Server in 0.0.0.0:8081

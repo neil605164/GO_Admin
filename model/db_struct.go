@@ -1,8 +1,11 @@
 package model
 
-// User 定義 user table
+import "time"
+
+// User 定義 user model
 type User struct {
-	Username string `db:"username"`
-	Password string `db:"password"`
-	// CreatedAt time.Time `db:"createdat"`
+	ID        int       `db:"id" gorm:"primary_key"`
+	Username  string    `db:"username" gorm:"column:username;not null;unique"`
+	Password  string    `db:"password" gorm:"column:password;not null"`
+	CreatedAt time.Time `db:"createdat" gorm:"column:createat"`
 }

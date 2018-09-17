@@ -14,6 +14,8 @@ var Config *DevConfig
 
 // Start 執行main.go的第一步驟，載入設定檔
 func Start() {
+
+	// 載入設定檔案資料
 	var err error
 	configFile, err = ioutil.ReadFile("conf/dev.yaml")
 	if err != nil {
@@ -25,10 +27,9 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
-
 }
 
-func getConfigData() (db *DevConfig, err error) {
-	err = yaml.Unmarshal(configFile, &db)
-	return db, err
+func getConfigData() (devConfig *DevConfig, err error) {
+	err = yaml.Unmarshal(configFile, &devConfig)
+	return devConfig, err
 }

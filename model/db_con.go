@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 /**
@@ -27,6 +28,17 @@ func dbConnect() (db *gorm.DB) {
 	return db
 }
 
+// CheckTableIsExist 啟動main.go服務時，直接檢查所有 DB 的 Table 是否已經存在
+func CheckTableIsExist() {
+	db := dbConnect()
+
+	defer db.Close()
+
+	if !db.HasTable("users") {
+		db.AutoMigrate(&User{})
+	}
+}
+
 // SQLRegisterMem 註冊會員
 func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	user := User{
@@ -36,7 +48,6 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	}
 
 	db := dbConnect()
-
 	defer db.Close()
 
 	// 檢查(主鍵)資料是否已經存在
@@ -50,6 +61,15 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 
 	// 	return err
 	// }
+
+	// 檢查DB是否存在，若存在才可以新增，否則回傳錯誤
+	if !db.HasTable("users") {
+		err = global.NewError{
+			Title:   "table is not exist",
+			Message: fmt.Sprintf("Users table is not exist, can not insert data"),
+		}
+		return err
+	}
 
 	err = db.Create(&user).Error
 	if err != nil {

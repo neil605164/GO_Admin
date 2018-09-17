@@ -3,7 +3,6 @@ package member
 import (
 	"GO_Admin/global"
 	"GO_Admin/model"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -27,7 +26,6 @@ func RegisterMember(c *gin.Context) {
 	err := model.SQLRegisterMem(registerMemberOption)
 	if err != nil {
 		registerMemberResult.Data = err
-		fmt.Printf("=========%v=========", err)
 		c.JSON(http.StatusOK, registerMemberResult)
 		return
 	}
