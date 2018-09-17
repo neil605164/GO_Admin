@@ -8,10 +8,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-/**
-* 建立 DB 連線
-* @return db *gorm.DB gorm.DB 記憶體位置
- */
+// dbConnect 建立 DB 連線
 func dbConnect() (db *gorm.DB) {
 	USER := global.Config.Database.User
 	PASSWORD := global.Config.Database.Password
@@ -50,18 +47,6 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	db := dbConnect()
 	defer db.Close()
 
-	// 檢查(主鍵)資料是否已經存在
-	// isExist := db.NewRecord(user)
-	// fmt.Printf("=========%v=========", isExist)
-	// if !isExist {
-	// err = global.NewError{
-	// 	Title:   "Data is Exist",
-	// 	Message: fmt.Sprintf("%s member is exist", user.Username),
-	// 	}
-
-	// 	return err
-	// }
-
 	// 檢查DB是否存在，若存在才可以新增，否則回傳錯誤
 	if !db.HasTable("users") {
 		err = global.NewError{
@@ -70,6 +55,18 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 		}
 		return err
 	}
+
+	// 檢查(主鍵)資料是否已經存在
+	// isExist := db.NewRecord(user)
+	// fmt.Printf("=========%v=========", isExist)
+	// if isExist {
+	// 	err = global.NewError{
+	// 		Title:   "Data is Exist !!!!!",
+	// 		Message: fmt.Sprintf("%s member is exist", user.Username),
+	// 	}
+
+	// 	return err
+	// }
 
 	err = db.Create(&user).Error
 	if err != nil {

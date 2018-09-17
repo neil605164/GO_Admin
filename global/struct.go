@@ -39,11 +39,6 @@ type RegisterMemberResult struct {
 	Data interface{}          `json:"data"`
 }
 
-// type RegisterMemberResult struct {
-// 	Meta interface{}  `json:"meta"`
-// 	Data interface{}  `json:"data"`
-// }
-
 func (e NewError) Error() string {
 	return fmt.Sprintf("%v: %v", e.Title, e.Message)
 }
