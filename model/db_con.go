@@ -41,7 +41,6 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	user := User{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
-		// CreatedAt: time.Now(),
 	}
 
 	db := dbConnect()
@@ -68,17 +67,34 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	// 	return err
 	// }
 
-	err = db.Create(&user).Error
-	if err != nil {
+	if err = db.Create(&user).Error; err != nil {
 		err = global.NewError{
 			Title:   "Member is Exist",
 			Message: fmt.Sprintf("%s member is exist", user.Username),
 		}
 		return err
 	}
+
 	return nil
 }
 
+// SQLGetUserList 取得用戶清單
+func SQLGetUserList() (userList *[]User, err error) {
+	var users []User
+
+	db := dbConnect()
+	defer db.Close()
+
+	if err := db.Find(&users).Error; err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when get all user list",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return nil, err
+	}
+	fmt.Println(&users)
+	return &users, nil
+}
 func checkError(err error) {
 	if err != nil {
 		panic(err)
