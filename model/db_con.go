@@ -5,11 +5,10 @@ import (
 	"fmt"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // dbConnect 建立 DB 連線
-func dbConnect() (db *gorm.DB) {
+func dbConnect() (db *gorm.DB, err error) {
 	USER := global.Config.Database.User
 	PASSWORD := global.Config.Database.Password
 	HOST := global.Config.Database.Host
@@ -19,21 +18,31 @@ func dbConnect() (db *gorm.DB) {
 	var connectionString = fmt.Sprintf("%s:%s@tcp(%s:3307)/%s?charset=utf8&parseTime=True&loc=Local", USER, PASSWORD, HOST, DATABASE)
 
 	// 建立連線
-	db, err := gorm.Open("mysql", connectionString)
-	checkError(err)
+	db, err = gorm.Open("mysql", connectionString)
+	if err != nil {
+		err = global.NewError{
+			Title:   "DB connect Fail",
+			Message: fmt.Sprintf("Error message is: %s", err),
+		}
+		return nil, err
+	}
 
-	return db
+	return db, nil
 }
 
 // CheckTableIsExist 啟動main.go服務時，直接檢查所有 DB 的 Table 是否已經存在
-func CheckTableIsExist() {
-	db := dbConnect()
+func CheckTableIsExist() error {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
 
 	defer db.Close()
 
 	if !db.HasTable("users") {
 		db.AutoMigrate(&User{})
 	}
+	return nil
 }
 
 // SQLRegisterMem 註冊會員
@@ -43,7 +52,11 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 		Password: rgMem.Password,
 	}
 
-	db := dbConnect()
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+
 	defer db.Close()
 
 	// 檢查DB是否存在，若存在才可以新增，否則回傳錯誤
@@ -55,22 +68,28 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 		return err
 	}
 
-	// 檢查(主鍵)資料是否已經存在
-	// isExist := db.NewRecord(user)
-	// fmt.Printf("=========%v=========", isExist)
-	// if isExist {
-	// 	err = global.NewError{
-	// 		Title:   "Data is Exist !!!!!",
-	// 		Message: fmt.Sprintf("%s member is exist", user.Username),
-	// 	}
+	// 檢查會員是否已存在
+	memExist, err := CheckMemExist(rgMem.Username, db)
+	if err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when check user exist",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
 
-	// 	return err
-	// }
-
-	if err = db.Create(&user).Error; err != nil {
+	if memExist {
 		err = global.NewError{
 			Title:   "Member is Exist",
 			Message: fmt.Sprintf("%s member is exist", user.Username),
+		}
+		return err
+	}
+
+	if err = db.Create(&user).Error; err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when register user",
+			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
 	}
@@ -82,7 +101,10 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 func SQLGetUserList() (userList *[]User, err error) {
 	var users []User
 
-	db := dbConnect()
+	db, err := dbConnect()
+	if err != nil {
+		return nil, err
+	}
 	defer db.Close()
 
 	if err := db.Find(&users).Error; err != nil {
@@ -95,8 +117,20 @@ func SQLGetUserList() (userList *[]User, err error) {
 	fmt.Println(&users)
 	return &users, nil
 }
-func checkError(err error) {
-	if err != nil {
-		panic(err)
+
+// CheckMemExist 檢查會員是否已經存在
+func CheckMemExist(member string, db *gorm.DB) (bool, error) {
+	var users []User
+
+	// 不預期錯誤
+	if err := db.Where("username = ?", member).Find(&users).Error; err != nil {
+		return true, err
 	}
+
+	// 用戶已存在
+	if len(users) > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }

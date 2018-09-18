@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func init() {
@@ -22,7 +23,10 @@ func main() {
 	// 載入環境設定
 	global.Start()
 	// 檢查DB Table 是否存在
-	model.CheckTableIsExist()
+	err := model.CheckTableIsExist()
+	if err != nil {
+		panic(err)
+	}
 	// 載入router設定
 	route.SetupRouter(r)
 
