@@ -9,14 +9,6 @@ import (
 // SetupRouter 路由控制
 func SetupRouter(r *gin.Engine) {
 
-	// Authorized group (uses gin.BasicAuth() middleware)
-	// Same than:
-	// authorized := r.Group("/")
-	// authorized.Use(gin.BasicAuth(gin.Credentials{
-	//	  "foo":  "bar",
-	//	  "manu": "123",
-	//}))
-
 	// 登入驗證
 	authorized := r.Group("/", gin.BasicAuth(gin.Accounts{
 		"foo":  "bar", // user:foo password:bar
@@ -24,7 +16,14 @@ func SetupRouter(r *gin.Engine) {
 	}))
 
 	// 註冊會員
-	authorized.POST("/register_member", member.RegisterMember)
+	authorized.POST("/register_Member", member.RegisterMember)
 	// 取得會員清單
-	authorized.GET("/get_User_List", member.GetUserList)
+	authorized.GET("/get_user_list", member.GetUserList)
+	// 編輯會員資料
+	authorized.PUT("/edit_user_info", member.EditUserInfo)
+	// 停用會員帳號
+	authorized.PUT("/freeze_user_account", member.FreezeUserAccount)
+	// 刪除會員帳號
+	authorized.DELETE("/delete_user_account", member.DeleteUserAccount)
+
 }
