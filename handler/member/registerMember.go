@@ -3,6 +3,8 @@ package member
 import (
 	"GO_Admin/global"
 	"GO_Admin/model"
+	"crypto/md5"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -17,6 +19,10 @@ func RegisterMember(c *gin.Context) {
 	registerMemberOption.Username = c.PostForm("account")
 	registerMemberOption.Password = c.PostForm("password")
 	// get param ecd
+
+	// encryption password start
+	registerMemberOption.Password = md5Encryption(registerMemberOption.Password)
+	// encryption password end
 
 	// compose param start
 	registerMemberResult := &global.RegisterMemberResult{}
@@ -35,4 +41,12 @@ func RegisterMember(c *gin.Context) {
 	// compose param end
 
 	c.JSON(http.StatusOK, *registerMemberResult)
+}
+
+func md5Encryption(str string) string {
+	data := []byte(str)
+	has := md5.Sum(data)
+	md5Str := fmt.Sprintf("%x", has)
+
+	return md5Str
 }
