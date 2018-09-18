@@ -42,6 +42,11 @@ func CheckTableIsExist() error {
 	if !db.HasTable("users") {
 		db.AutoMigrate(&User{})
 	}
+
+	if !db.HasTable("user_infos") {
+		db.AutoMigrate(&User_Info{})
+	}
+
 	return nil
 }
 

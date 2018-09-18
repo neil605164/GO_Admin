@@ -1,3 +1,9 @@
+/*******************************************
+* 每次新增DB的Sturct，                      *
+* 都需要調整dbcon.go的CheckTableIsExist，   *
+* 進行Migrate驗證。                         *
+*******************************************/
+
 package model
 
 import "time"
@@ -11,5 +17,14 @@ type User struct {
 	Username  string    `gorm:"column:username;not null;unique;primary_key"`
 	Password  string    `gorm:"column:password;not null"`
 	Status    int       `gorm:"column:status;default:0;not null`
+	CreatedAt time.Time `gorm:"column:createat"`
+}
+
+type User_Info struct {
+	ID        int       `gorm:"column:id;primary_key;AUTO_INCREMENT;not null"`
+	Username  string    `gorm:"column:username;not null;unique;primary_key"`
+	Nickname  string    `gorm:"column:nickname;not null"`
+	Email     string    `gorm:"column:email;not null"`
+	Addr      string    `gorm:"column:addr;not null"`
 	CreatedAt time.Time `gorm:"column:createat"`
 }
