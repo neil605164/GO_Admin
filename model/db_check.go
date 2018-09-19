@@ -35,7 +35,7 @@ func checkUserInfoTable(tableName string, db *gorm.DB) (bool, error) {
 
 // CheckMemExist 檢查會員是否已經存在
 func CheckMemExist(member string, db *gorm.DB) (bool, error) {
-	var users []user
+	var users []User
 
 	// 不預期錯誤
 	if err := db.Where("username = ?", member).Find(&users).Error; err != nil {

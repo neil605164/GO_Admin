@@ -41,11 +41,11 @@ func CheckTableIsExist() error {
 	defer db.Close()
 
 	if !db.HasTable("users") {
-		db.AutoMigrate(&user{})
+		db.AutoMigrate(&User{})
 	}
 
 	if !db.HasTable("user_infos") {
-		db.AutoMigrate(&userInfo{})
+		db.AutoMigrate(&UserInfo{})
 	}
 
 	return nil
@@ -53,12 +53,12 @@ func CheckTableIsExist() error {
 
 // SQLRegisterMem 註冊會員
 func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
-	user := user{
+	user := User{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
 	}
 
-	userInfo := userInfo{
+	userInfo := UserInfo{
 		Username: rgMem.Username,
 		Nickname: rgMem.Nickname,
 		Email:    rgMem.Enail,
@@ -87,31 +87,20 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 		return err
 	}
 
-	// if err = db.Create(&user).Error; err != nil {
-	// 	err = global.NewError{
-	// 		Title:   "Unexpected error when register user",
-	// 		Message: fmt.Sprintf("Error massage is: %s", err),
-	// 	}
-	// 	return err
-	// }
-	go func(user *user, db *gorm.DB) {
-		createMemberData(&user, db)
+	go func(user *User, db *gorm.DB) {
+		createUserData(user, db)
 	}(&user, db)
 
-	if err = db.Create(&userInfo).Error; err != nil {
-		err = global.NewError{
-			Title:   "Unexpected error when register user",
-			Message: fmt.Sprintf("Error massage is: %s", err),
-		}
-		return err
-	}
+	go func(userInfo *UserInfo, db *gorm.DB) {
+		createUserInfoData(userInfo, db)
+	}(&userInfo, db)
 
 	return nil
 }
 
 // SQLGetUserList 取得用戶清單
-func SQLGetUserList() (userList *[]user, err error) {
-	var users []user
+func SQLGetUserList() (userList *[]User, err error) {
+	var users []User
 
 	db, err := dbConnect()
 	if err != nil {
@@ -132,13 +121,13 @@ func SQLGetUserList() (userList *[]user, err error) {
 
 // SQLEditUserInfo 編輯會員資料
 func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
-	user := user{
+	user := User{
 		Username:  edUserInfo.Username,
 		Password:  edUserInfo.Password,
 		CreatedAt: time.Now(),
 	}
 
-	userInfo := userInfo{
+	userInfo := UserInfo{
 		Username:  edUserInfo.Username,
 		Nickname:  edUserInfo.Nickname,
 		Email:     edUserInfo.Enail,
@@ -187,7 +176,7 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 	return nil
 }
 
-func createMemberData(user *user, db *gorm.DB) error {
+func createUserData(user *User, db *gorm.DB) error {
 	if err := db.Create(&user).Error; err != nil {
 		err = global.NewError{
 			Title:   "Unexpected error when register user",
@@ -196,5 +185,16 @@ func createMemberData(user *user, db *gorm.DB) error {
 		return err
 	}
 
+	return nil
+}
+
+func createUserInfoData(userInfo *UserInfo, db *gorm.DB) error {
+	if err := db.Create(&userInfo).Error; err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when register user",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
 	return nil
 }
