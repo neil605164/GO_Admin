@@ -15,7 +15,7 @@ func dbConnect() (db *gorm.DB, err error) {
 	DATABASE := global.Config.Database.Database
 
 	// 組合連線資訊
-	var connectionString = fmt.Sprintf("%s:%s@tcp(%s:3307)/%s?charset=utf8&parseTime=True&loc=Local", USER, PASSWORD, HOST, DATABASE)
+	var connectionString = fmt.Sprintf("%s:%s@tcp(%s:3307)/%s?charset=utf8mb4&parseTime=True&loc=Local", USER, PASSWORD, HOST, DATABASE)
 
 	// 建立連線
 	db, err = gorm.Open("mysql", connectionString)
@@ -44,7 +44,7 @@ func CheckTableIsExist() error {
 	}
 
 	if !db.HasTable("user_infos") {
-		db.AutoMigrate(&User_Info{})
+		db.AutoMigrate(&UserInfo{})
 	}
 
 	return nil
@@ -55,6 +55,13 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	user := User{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
+	}
+
+	userInfo := UserInfo{
+		Username: rgMem.Username,
+		Nickname: rgMem.Nickname,
+		Email:    rgMem.Enail,
+		Addr:     rgMem.Addr,
 	}
 
 	db, err := dbConnect()
@@ -69,6 +76,14 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 		err = global.NewError{
 			Title:   "table is not exist",
 			Message: fmt.Sprintf("Users table is not exist, can not insert data"),
+		}
+		return err
+	}
+
+	if !db.HasTable("user_infos") {
+		err = global.NewError{
+			Title:   "table is not exist",
+			Message: fmt.Sprintf("Users_Info table is not exist, can not insert data"),
 		}
 		return err
 	}
@@ -92,6 +107,14 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	}
 
 	if err = db.Create(&user).Error; err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when register user",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+
+	if err = db.Create(&userInfo).Error; err != nil {
 		err = global.NewError{
 			Title:   "Unexpected error when register user",
 			Message: fmt.Sprintf("Error massage is: %s", err),

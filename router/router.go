@@ -16,7 +16,7 @@ func SetupRouter(r *gin.Engine) {
 	}))
 
 	// 註冊會員
-	authorized.POST("/register_Member", member.RegisterMember)
+	authorized.POST("/register_member", member.RegisterMember)
 	// 取得會員清單
 	authorized.GET("/get_user_list", member.GetUserList)
 	// 編輯會員資料

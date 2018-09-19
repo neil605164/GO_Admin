@@ -29,6 +29,9 @@ type Dbconnect struct {
 type RegisterMemberOption struct {
 	Username string
 	Password string
+	Nickname string
+	Enail    string
+	Addr     string
 }
 
 // RegisterMemberResult 回傳註冊會員後的結果

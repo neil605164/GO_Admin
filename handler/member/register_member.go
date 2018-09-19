@@ -16,6 +16,9 @@ func RegisterMember(c *gin.Context) {
 	registerMemberOption := &global.RegisterMemberOption{}
 	registerMemberOption.Username = c.PostForm("account")
 	registerMemberOption.Password = c.PostForm("password")
+	registerMemberOption.Nickname = c.PostForm("nickname")
+	registerMemberOption.Enail = c.PostForm("email")
+	registerMemberOption.Addr = c.PostForm("addr")
 	// get param ecd
 
 	// encryption password start
