@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Md5Encryption md5加密
 func Md5Encryption(str string) string {
 	data := []byte(str)
 	has := md5.Sum(data)

@@ -2,16 +2,6 @@ package global
 
 import "fmt"
 
-// const (
-// 	REGISTER_MEMBER = "INSERT INTO "
-// )
-
-// NewError 自行定義錯誤格式
-type NewError struct {
-	Title   string
-	Message string
-}
-
 // DevConfig dev.yaml格式
 type DevConfig struct {
 	Database Dbconnect `yaml:"database"`
@@ -42,9 +32,35 @@ type RegisterMemberResult struct {
 	Data interface{}          `json:"data"`
 }
 
+// GetUserListResult 回傳取會員清單後的結果
+// Meta 表示帶入的參數
+// Data 表示回傳的任何資料
 type GetUserListResult struct {
 	Meta interface{} `json:"meta"`
 	Data interface{} `json:"data"`
+}
+
+// EditUserInfoOption 呼叫「修改會員資訊」時，帶入的參數
+type EditUserInfoOption struct {
+	Username string
+	Password string
+	Nickname string
+	Enail    string
+	Addr     string
+}
+
+// EditUserInfoResult 回傳編輯會員資訊後的結果
+// Meta 表示帶入的參數
+// Data 表示回傳的任何資料
+type EditUserInfoResult struct {
+	Meta interface{} `json:"meta"`
+	Data interface{} `json:"data"`
+}
+
+// NewError 自行定義錯誤格式
+type NewError struct {
+	Title   string
+	Message string
 }
 
 func (e NewError) Error() string {

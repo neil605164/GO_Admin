@@ -3,6 +3,7 @@ package model
 import (
 	"GO_Admin/global"
 	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -161,4 +162,81 @@ func CheckMemExist(member string, db *gorm.DB) (bool, error) {
 	}
 
 	return false, nil
+}
+
+// SQLEditUserInfo 編輯會員資料
+func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
+	user := User{
+		Username:  edUserInfo.Username,
+		Password:  edUserInfo.Password,
+		CreatedAt: time.Now(),
+	}
+
+	userInfo := UserInfo{
+		Username:  edUserInfo.Username,
+		Nickname:  edUserInfo.Nickname,
+		Email:     edUserInfo.Enail,
+		Addr:      edUserInfo.Addr,
+		CreatedAt: time.Now(),
+	}
+
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+
+	defer db.Close()
+
+	// 檢查DB是否存在，若存在才可以新增，否則回傳錯誤
+	if !db.HasTable("users") {
+		err = global.NewError{
+			Title:   "table is not exist",
+			Message: fmt.Sprintf("Users table is not exist, can not insert data"),
+		}
+		return err
+	}
+
+	if !db.HasTable("user_infos") {
+		err = global.NewError{
+			Title:   "table is not exist",
+			Message: fmt.Sprintf("Users_Info table is not exist, can not insert data"),
+		}
+		return err
+	}
+
+	// 檢查會員是否已存在
+	memExist, err := CheckMemExist(edUserInfo.Username, db)
+	if err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when check user exist",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+
+	if !memExist {
+		err = global.NewError{
+			Title:   "Member is not exist",
+			Message: fmt.Sprintf("%s member is not exist", user.Username),
+		}
+		return err
+	}
+
+	if err = db.Model(&user).Where("username = ?", edUserInfo.Username).Updates(&user).Error; err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when edit users table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+
+	if err = db.Model(&userInfo).Where("username = ?", edUserInfo.Username).Updates(&userInfo).Error; err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when edit user_infos table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+
+	return nil
 }

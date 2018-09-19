@@ -19,7 +19,7 @@ func RegisterMember(c *gin.Context) {
 	registerMemberOption.Nickname = c.PostForm("nickname")
 	registerMemberOption.Enail = c.PostForm("email")
 	registerMemberOption.Addr = c.PostForm("addr")
-	// get param ecd
+	// get param end
 
 	// encryption password start
 	registerMemberOption.Password = global.Md5Encryption(registerMemberOption.Password)
