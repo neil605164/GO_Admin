@@ -41,11 +41,11 @@ func CheckTableIsExist() error {
 	defer db.Close()
 
 	if !db.HasTable("users") {
-		db.AutoMigrate(&User{})
+		db.AutoMigrate(&user{})
 	}
 
 	if !db.HasTable("user_infos") {
-		db.AutoMigrate(&UserInfo{})
+		db.AutoMigrate(&userInfo{})
 	}
 
 	return nil
@@ -53,12 +53,12 @@ func CheckTableIsExist() error {
 
 // SQLRegisterMem 註冊會員
 func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
-	user := User{
+	user := user{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
 	}
 
-	userInfo := UserInfo{
+	userInfo := userInfo{
 		Username: rgMem.Username,
 		Nickname: rgMem.Nickname,
 		Email:    rgMem.Enail,
@@ -72,48 +72,31 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 
 	defer db.Close()
 
-	// 檢查DB是否存在，若存在才可以新增，否則回傳錯誤
-	if !db.HasTable("users") {
-		err = global.NewError{
-			Title:   "table is not exist",
-			Message: fmt.Sprintf("Users table is not exist, can not insert data"),
-		}
+	checkUserBool, err := checkUserTable("users", db)
+	if !checkUserBool && err != nil {
 		return err
 	}
 
-	if !db.HasTable("user_infos") {
-		err = global.NewError{
-			Title:   "table is not exist",
-			Message: fmt.Sprintf("Users_Info table is not exist, can not insert data"),
-		}
+	checkUserInfoBool, err := checkUserInfoTable("user_infos", db)
+	if !checkUserInfoBool && err != nil {
 		return err
 	}
 
-	// 檢查會員是否已存在
-	memExist, err := CheckMemExist(rgMem.Username, db)
-	if err != nil {
-		err = global.NewError{
-			Title:   "Unexpected error when check user exist",
-			Message: fmt.Sprintf("Error massage is: %s", err),
-		}
+	memExistBool, err := CheckMemExist(rgMem.Username, db)
+	if memExistBool && err != nil {
 		return err
 	}
 
-	if memExist {
-		err = global.NewError{
-			Title:   "Member is Exist",
-			Message: fmt.Sprintf("%s member is exist", user.Username),
-		}
-		return err
-	}
-
-	if err = db.Create(&user).Error; err != nil {
-		err = global.NewError{
-			Title:   "Unexpected error when register user",
-			Message: fmt.Sprintf("Error massage is: %s", err),
-		}
-		return err
-	}
+	// if err = db.Create(&user).Error; err != nil {
+	// 	err = global.NewError{
+	// 		Title:   "Unexpected error when register user",
+	// 		Message: fmt.Sprintf("Error massage is: %s", err),
+	// 	}
+	// 	return err
+	// }
+	go func(user *user, db *gorm.DB) {
+		createMemberData(&user, db)
+	}(&user, db)
 
 	if err = db.Create(&userInfo).Error; err != nil {
 		err = global.NewError{
@@ -127,8 +110,8 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 }
 
 // SQLGetUserList 取得用戶清單
-func SQLGetUserList() (userList *[]User, err error) {
-	var users []User
+func SQLGetUserList() (userList *[]user, err error) {
+	var users []user
 
 	db, err := dbConnect()
 	if err != nil {
@@ -147,32 +130,15 @@ func SQLGetUserList() (userList *[]User, err error) {
 	return &users, nil
 }
 
-// CheckMemExist 檢查會員是否已經存在
-func CheckMemExist(member string, db *gorm.DB) (bool, error) {
-	var users []User
-
-	// 不預期錯誤
-	if err := db.Where("username = ?", member).Find(&users).Error; err != nil {
-		return true, err
-	}
-
-	// 用戶已存在
-	if len(users) > 0 {
-		return true, nil
-	}
-
-	return false, nil
-}
-
 // SQLEditUserInfo 編輯會員資料
 func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
-	user := User{
+	user := user{
 		Username:  edUserInfo.Username,
 		Password:  edUserInfo.Password,
 		CreatedAt: time.Now(),
 	}
 
-	userInfo := UserInfo{
+	userInfo := userInfo{
 		Username:  edUserInfo.Username,
 		Nickname:  edUserInfo.Nickname,
 		Email:     edUserInfo.Enail,
@@ -187,42 +153,22 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 
 	defer db.Close()
 
-	// 檢查DB是否存在，若存在才可以新增，否則回傳錯誤
-	if !db.HasTable("users") {
-		err = global.NewError{
-			Title:   "table is not exist",
-			Message: fmt.Sprintf("Users table is not exist, can not insert data"),
-		}
+	checkUserBool, err := checkUserTable("users", db)
+	if !checkUserBool && err != nil {
 		return err
 	}
 
-	if !db.HasTable("user_infos") {
-		err = global.NewError{
-			Title:   "table is not exist",
-			Message: fmt.Sprintf("Users_Info table is not exist, can not insert data"),
-		}
+	checkUserInfoBool, err := checkUserInfoTable("user_infos", db)
+	if !checkUserInfoBool && err != nil {
 		return err
 	}
 
-	// 檢查會員是否已存在
-	memExist, err := CheckMemExist(edUserInfo.Username, db)
-	if err != nil {
-		err = global.NewError{
-			Title:   "Unexpected error when check user exist",
-			Message: fmt.Sprintf("Error massage is: %s", err),
-		}
+	memExistBool, err := CheckMemExist(edUserInfo.Username, db)
+	if memExistBool && err != nil {
 		return err
 	}
 
-	if !memExist {
-		err = global.NewError{
-			Title:   "Member is not exist",
-			Message: fmt.Sprintf("%s member is not exist", user.Username),
-		}
-		return err
-	}
-
-	if err = db.Model(&user).Where("username = ?", edUserInfo.Username).Updates(&user).Error; err != nil {
+	if err = db.Model(&user).Where("username = ?", user.Username).Updates(&user).Error; err != nil {
 		err = global.NewError{
 			Title:   "Unexpected error when edit users table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
@@ -233,6 +179,18 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 	if err = db.Model(&userInfo).Where("username = ?", edUserInfo.Username).Updates(&userInfo).Error; err != nil {
 		err = global.NewError{
 			Title:   "Unexpected error when edit user_infos table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+
+	return nil
+}
+
+func createMemberData(user *user, db *gorm.DB) error {
+	if err := db.Create(&user).Error; err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when register user",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
