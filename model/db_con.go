@@ -59,7 +59,6 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	}
 	defer db.Close()
 
-	errorMsg := make(chan error)
 	user := User{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
@@ -72,29 +71,31 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 		Addr:     rgMem.Addr,
 	}
 
-	if checkUserTable("users", db); err != nil {
-		return err
-	}
-
-	if checkUserInfoTable("user_infos", db); err != nil {
-		return err
-	}
-
 	if CheckMemExist(rgMem.Username, db); err != nil {
 		return err
 	}
 
-	go func(user *User, db *gorm.DB) {
-		err = createUserData(user, db)
-		errorMsg <- err
-	}(&user, db)
+	tx := db.Begin()
 
-	go func(userInfo *UserInfo, db *gorm.DB) {
-		err = createUserInfoData(userInfo, db)
-		errorMsg <- err
-	}(&userInfo, db)
+	if err := tx.Create(&user).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when register user",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
 
-	err = <-errorMsg
+	if err := tx.Create(&userInfo).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when register user",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+
+	tx.Commit()
 	return err
 }
 
@@ -127,8 +128,6 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 	}
 	defer db.Close()
 
-	errorMsg := make(chan error)
-
 	user := User{
 		Username:  edUserInfo.Username,
 		Password:  edUserInfo.Password,
@@ -143,78 +142,27 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 		CreatedAt: time.Now(),
 	}
 
-	if checkUserTable("users", db); err != nil {
-		return err
-	}
-
-	if checkUserInfoTable("user_infos", db); err != nil {
-		return err
-	}
+	tx := db.Begin()
 
 	if CheckMemExist(edUserInfo.Username, db); err != nil {
 		return err
 	}
 
-	go func(user *User, db *gorm.DB) {
-		err = updateUserData(user, db)
-		errorMsg <- err
-	}(&user, db)
-
-	go func(userInfo *UserInfo, db *gorm.DB) {
-		err = updateUserInfoData(userInfo, db)
-		errorMsg <- err
-	}(&userInfo, db)
-
-	err = <-errorMsg
-
-	return nil
-}
-
-// createUserData 新增資料至users table
-func createUserData(user *User, db *gorm.DB) error {
-	if err := db.Create(&user).Error; err != nil {
-		err = global.NewError{
-			Title:   "Unexpected error when register user",
-			Message: fmt.Sprintf("Error massage is: %s", err),
-		}
-		return err
-	}
-
-	return nil
-}
-
-// createUserInfoData 新增資料至user_infos table
-func createUserInfoData(userInfo *UserInfo, db *gorm.DB) error {
-	if err := db.Create(&userInfo).Error; err != nil {
-		err = global.NewError{
-			Title:   "Unexpected error when register user",
-			Message: fmt.Sprintf("Error massage is: %s", err),
-		}
-		return err
-	}
-	return nil
-}
-
-// updateUserData 更新資料至users table
-func updateUserData(user *User, db *gorm.DB) error {
-	if err := db.Model(&user).Where("username = ?", user.Username).Updates(&user).Error; err != nil {
+	if err := tx.Model(&user).Where("username = ?", user.Username).Updates(&user).Error; err != nil {
 		err = global.NewError{
 			Title:   "Unexpected error when edit users table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
 	}
-	return nil
-}
 
-// updateUserInfoData 新增資料至user_infos table
-func updateUserInfoData(edUserInfo *UserInfo, db *gorm.DB) error {
-	if err := db.Model(&edUserInfo).Where("username = ?", edUserInfo.Username).Updates(&edUserInfo).Error; err != nil {
+	if err := tx.Model(&userInfo).Where("username = ?", userInfo.Username).Updates(&userInfo).Error; err != nil {
 		err = global.NewError{
 			Title:   "Unexpected error when edit user_infos table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
 	}
+
 	return nil
 }
