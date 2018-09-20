@@ -8,33 +8,33 @@ import (
 )
 
 // checkUserTable 檢查users table 是否存在
-func checkUserTable(tableName string, db *gorm.DB) (bool, error) {
+func checkUserTable(tableName string, db *gorm.DB) error {
 	if !db.HasTable(tableName) {
 		err := global.NewError{
 			Title:   "table is not exist",
 			Message: fmt.Sprintf("Users table is not exist, can not insert data"),
 		}
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }
 
 // checkUserInfoTable 檢查users_infos table 是否存在
-func checkUserInfoTable(tableName string, db *gorm.DB) (bool, error) {
+func checkUserInfoTable(tableName string, db *gorm.DB) error {
 	if !db.HasTable(tableName) {
 		err := global.NewError{
 			Title:   "table is not exist",
 			Message: fmt.Sprintf("Users_Info table is not exist, can not insert data"),
 		}
-		return false, err
+		return err
 	}
 
-	return true, nil
+	return nil
 }
 
 // CheckMemExist 檢查會員是否已經存在
-func CheckMemExist(member string, db *gorm.DB) (bool, error) {
+func CheckMemExist(member string, db *gorm.DB) error {
 	var users []User
 
 	// 不預期錯誤
@@ -43,7 +43,7 @@ func CheckMemExist(member string, db *gorm.DB) (bool, error) {
 			Title:   "Unexpected error when check user exist",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
-		return true, err
+		return err
 	}
 
 	// 用戶已存在
@@ -52,8 +52,8 @@ func CheckMemExist(member string, db *gorm.DB) (bool, error) {
 			Title:   "Member is Exist",
 			Message: fmt.Sprintf("%s member is exist", member),
 		}
-		return true, err
+		return err
 	}
 
-	return false, nil
+	return nil
 }
