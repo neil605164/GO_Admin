@@ -25,7 +25,7 @@ func checkUserInfoTable(tableName string, db *gorm.DB) (bool, error) {
 	if !db.HasTable(tableName) {
 		err := global.NewError{
 			Title:   "table is not exist",
-			Message: fmt.Sprintf("Users table is not exist, can not insert data"),
+			Message: fmt.Sprintf("Users_Info table is not exist, can not insert data"),
 		}
 		return false, err
 	}

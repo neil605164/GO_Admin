@@ -53,6 +53,8 @@ func CheckTableIsExist() error {
 
 // SQLRegisterMem 註冊會員
 func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
+	errorMsg := make(chan error)
+
 	user := User{
 		Username: rgMem.Username,
 		Password: rgMem.Password,
@@ -88,14 +90,18 @@ func SQLRegisterMem(rgMem *global.RegisterMemberOption) (err error) {
 	}
 
 	go func(user *User, db *gorm.DB) {
-		createUserData(user, db)
+		err = createUserData(user, db)
+		errorMsg <- err
 	}(&user, db)
 
 	go func(userInfo *UserInfo, db *gorm.DB) {
-		createUserInfoData(userInfo, db)
+		err = createUserInfoData(userInfo, db)
+		errorMsg <- err
 	}(&userInfo, db)
 
-	return nil
+	err = <-errorMsg
+	fmt.Println(err)
+	return err
 }
 
 // SQLGetUserList 取得用戶清單
