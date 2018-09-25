@@ -149,6 +149,7 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 	}
 
 	if err := tx.Model(&user).Where("username = ?", user.Username).Updates(&user).Error; err != nil {
+		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when edit users table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
@@ -157,12 +158,46 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 	}
 
 	if err := tx.Model(&userInfo).Where("username = ?", userInfo.Username).Updates(&userInfo).Error; err != nil {
+		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when edit user_infos table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
 	}
+
+	tx.Commit()
+	return nil
+}
+
+// SQKFreezeUserAccount 停用用戶帳號
+func SQKFreezeUserAccount(freezeMem *global.FreezeUserAccountOption) (err error) {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	user := User{
+		Status:    1,
+		CreatedAt: time.Now(),
+	}
+
+	if CheckMemExist(freezeMem.Username, db); err != nil {
+		return err
+	}
+
+	tx := db.Begin()
+
+	if err = tx.Model(&user).Where("username = ?", freezeMem.Username).Update(&user).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when edit user table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+	tx.Commit()
 
 	return nil
 }

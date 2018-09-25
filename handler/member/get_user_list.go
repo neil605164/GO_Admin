@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetUserList 取得使用者清單
 func GetUserList(c *gin.Context) {
 	log.Println("=======Get User List Start=======:")
 	// compose param start

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// EditUserInfo 編輯使用者資訊
 func EditUserInfo(c *gin.Context) {
 	log.Println("=======Edit User Info Start=======:")
 	// get param start
@@ -26,7 +27,7 @@ func EditUserInfo(c *gin.Context) {
 
 	// compose param start
 	editUserInfoResult := &global.EditUserInfoResult{}
-	editUserInfoResult.Meta = editUserInfoOption
+	editUserInfoResult.Meta = *editUserInfoOption
 
 	// execute db start
 	err := model.SQLEditUserInfo(editUserInfoOption)
@@ -41,6 +42,4 @@ func EditUserInfo(c *gin.Context) {
 	// compose param end
 
 	c.JSON(http.StatusOK, *editUserInfoResult)
-
-	c.String(http.StatusOK, "edit user info")
 }

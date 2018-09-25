@@ -53,8 +53,19 @@ type EditUserInfoOption struct {
 // Meta 表示帶入的參數
 // Data 表示回傳的任何資料
 type EditUserInfoResult struct {
-	Meta interface{} `json:"meta"`
-	Data interface{} `json:"data"`
+	Meta EditUserInfoOption `json:"meta"`
+	Data interface{}        `json:"data"`
+}
+
+// FreezeUserAccountOption 停用「用戶帳號」時，帶入的參數
+type FreezeUserAccountOption struct {
+	Username string
+}
+
+// FreezeUserAccountResult 回傳用戶帳號後的結果
+type FreezeUserAccountResult struct {
+	Meta FreezeUserAccountOption `json:"meta"`
+	Data interface{}             `json:"data"`
 }
 
 // NewError 自行定義錯誤格式
