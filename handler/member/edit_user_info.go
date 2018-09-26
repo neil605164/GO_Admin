@@ -30,8 +30,7 @@ func EditUserInfo(c *gin.Context) {
 	editUserInfoResult.Meta = *editUserInfoOption
 
 	// execute db start
-	err := model.SQLEditUserInfo(editUserInfoOption)
-	if err != nil {
+	if err := model.SQLEditUserInfo(editUserInfoOption); err != nil {
 		editUserInfoResult.Data = err
 		c.JSON(http.StatusOK, editUserInfoResult)
 		return

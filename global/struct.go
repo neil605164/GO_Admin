@@ -62,9 +62,20 @@ type FreezeUserAccountOption struct {
 	Username string
 }
 
-// FreezeUserAccountResult 回傳用戶帳號後的結果
+// FreezeUserAccountResult 回傳停用用戶帳號後的結果
 type FreezeUserAccountResult struct {
 	Meta FreezeUserAccountOption `json:"meta"`
+	Data interface{}             `json:"data"`
+}
+
+// DeleteUserAccountOption 刪除「用戶帳號」時，帶入的參數
+type DeleteUserAccountOption struct {
+	Username string
+}
+
+// DelteUserAccountResult 回傳刪除用戶帳號後的結果
+type DelteUserAccountResult struct {
+	Meta DeleteUserAccountOption `json:"meta"`
 	Data interface{}             `json:"data"`
 }
 

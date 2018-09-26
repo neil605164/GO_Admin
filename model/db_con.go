@@ -201,3 +201,33 @@ func SQKFreezeUserAccount(freezeMem *global.FreezeUserAccountOption) (err error)
 
 	return nil
 }
+
+// SQLDeleteUserAccount 刪除用戶帳號
+func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error) {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	user := User{
+		Status: 2,
+	}
+
+	if CheckMemExist(deleteMem.Username, db); err != nil {
+		return err
+	}
+
+	tx := db.Begin()
+	if err = tx.Model(&user).Where("username = ?", deleteMem.Username).Update(&user).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when edit user table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+	tx.Commit()
+
+	return nil
+}
