@@ -79,6 +79,17 @@ type DelteUserAccountResult struct {
 	Data interface{}             `json:"data"`
 }
 
+// EnableUserAccountOption 「啟用用戶帳號」時，帶入的參數
+type EnableUserAccountOption struct {
+	Username string
+}
+
+// EnableUserAccountResult 回傳啟用用戶帳號後的結果
+type EnableUserAccountResult struct {
+	Meta EnableUserAccountOption `json:"meta"`
+	Data interface{}             `json:"data"`
+}
+
 // NewError 自行定義錯誤格式
 type NewError struct {
 	Title   string

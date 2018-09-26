@@ -231,3 +231,8 @@ func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error)
 
 	return nil
 }
+
+// SQLEnableUserAccount 啟用會員帳號
+func SQLEnableUserAccount(enableMem *global.EnableUserAccountOption) (err error) {
+	return nil
+}
