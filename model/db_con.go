@@ -3,7 +3,6 @@ package model
 import (
 	"GO_Admin/global"
 	"fmt"
-	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -111,7 +110,7 @@ func SQLGetUserList() (userList *[]User, err error) {
 
 	if err := db.Find(&users).Error; err != nil {
 		err = global.NewError{
-			Title:   "Unexpected error when get all user list",
+			Title:   "Unexpected error when get all users list",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return nil, err
@@ -129,17 +128,15 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 	defer db.Close()
 
 	user := User{
-		Username:  edUserInfo.Username,
-		Password:  edUserInfo.Password,
-		CreatedAt: time.Now(),
+		Username: edUserInfo.Username,
+		Password: edUserInfo.Password,
 	}
 
 	userInfo := UserInfo{
-		Username:  edUserInfo.Username,
-		Nickname:  edUserInfo.Nickname,
-		Email:     edUserInfo.Enail,
-		Addr:      edUserInfo.Addr,
-		CreatedAt: time.Now(),
+		Username: edUserInfo.Username,
+		Nickname: edUserInfo.Nickname,
+		Email:    edUserInfo.Enail,
+		Addr:     edUserInfo.Addr,
 	}
 
 	tx := db.Begin()
@@ -179,8 +176,7 @@ func SQKFreezeUserAccount(freezeMem *global.FreezeUserAccountOption) (err error)
 	defer db.Close()
 
 	user := User{
-		Status:    1,
-		CreatedAt: time.Now(),
+		Status: 1,
 	}
 
 	if CheckMemExist(freezeMem.Username, db); err != nil {
@@ -192,7 +188,7 @@ func SQKFreezeUserAccount(freezeMem *global.FreezeUserAccountOption) (err error)
 	if err = tx.Model(&user).Where("username = ?", freezeMem.Username).Update(&user).Error; err != nil {
 		tx.Rollback()
 		err = global.NewError{
-			Title:   "Unexpected error when edit user table",
+			Title:   "Unexpected error when edit users table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
@@ -210,19 +206,27 @@ func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error)
 	}
 	defer db.Close()
 
-	user := User{
-		Status: 2,
-	}
+	user := User{}
+	userInfo := UserInfo{}
 
 	if CheckMemExist(deleteMem.Username, db); err != nil {
 		return err
 	}
 
 	tx := db.Begin()
-	if err = tx.Model(&user).Where("username = ?", deleteMem.Username).Update(&user).Error; err != nil {
+	if err = tx.Model(&user).Where("username = ?", deleteMem.Username).Delete(&user).Error; err != nil {
 		tx.Rollback()
 		err = global.NewError{
-			Title:   "Unexpected error when edit user table",
+			Title:   "Unexpected error when delete users table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+
+	if err = tx.Model(&userInfo).Where("username = ?", deleteMem.Username).Delete(&userInfo).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when delete user_infos table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
