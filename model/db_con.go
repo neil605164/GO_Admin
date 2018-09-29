@@ -214,25 +214,43 @@ func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error)
 	}
 
 	tx := db.Begin()
-	if err = tx.Model(&user).Where("username = ?", deleteMem.Username).Delete(&user).Error; err != nil {
+	execRes := tx.Model(&user).Where("username = ?", deleteMem.Username).Delete(&user)
+	if execRes.Error != nil {
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when delete users table",
-			Message: fmt.Sprintf("Error massage is: %s", err),
+			Message: fmt.Sprintf("Error massage is: %s", execRes.Error),
+		}
+		return err
+	}
+	if execRes.RowsAffected == 0 {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "data is not exist when delete users table",
+			Message: fmt.Sprintf("Affected rows is: %d", execRes.RowsAffected),
 		}
 		return err
 	}
 
-	if err = tx.Model(&userInfo).Where("username = ?", deleteMem.Username).Delete(&userInfo).Error; err != nil {
+	execRes = tx.Model(&userInfo).Where("username = ?", deleteMem.Username).Delete(&userInfo)
+	if execRes.Error != nil {
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when delete user_infos table",
-			Message: fmt.Sprintf("Error massage is: %s", err),
+			Message: fmt.Sprintf("Error massage is: %s", execRes.Error),
 		}
 		return err
 	}
-	tx.Commit()
+	if execRes.RowsAffected == 0 {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "data is not exist when delete user_infos table",
+			Message: fmt.Sprintf("Affected rows is: %d", execRes.RowsAffected),
+		}
+		return err
+	}
 
+	tx.Commit()
 	return nil
 }
 
