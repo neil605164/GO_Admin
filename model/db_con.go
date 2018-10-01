@@ -176,7 +176,7 @@ func SQKFreezeUserAccount(freezeMem *global.FreezeUserAccountOption) (err error)
 	defer db.Close()
 
 	user := User{
-		Status: "1",
+		Status: 1,
 	}
 
 	if CheckMemExist(freezeMem.Username, db); err != nil {
@@ -263,9 +263,12 @@ func SQLEnableUserAccount(enableMem *global.EnableUserAccountOption) (err error)
 	}
 	defer db.Close()
 
-	user := User{
-		Status: "0",
-	}
+	// user := User{
+	// 	Status: "0",
+	// }
+
+	user := map[string]int{}
+	user["status"] = 0
 
 	if CheckMemExist(enableMem.Username, db); err != nil {
 		return err
