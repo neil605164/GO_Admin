@@ -25,7 +25,7 @@ func SetupRouter(r *gin.Engine) {
 	authorized.PUT("/freeze_user_account", member.FreezeUserAccount)
 	// 刪除會員帳號
 	authorized.DELETE("/delete_user_account/:account", member.DeleteUserAccount)
-	// 請用會員帳號
+	// 啟用會員帳號
 	authorized.PUT("/enable_user_account", member.EnableUserAccount)
 
 }

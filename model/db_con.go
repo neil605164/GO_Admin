@@ -176,7 +176,7 @@ func SQKFreezeUserAccount(freezeMem *global.FreezeUserAccountOption) (err error)
 	defer db.Close()
 
 	user := User{
-		Status: 1,
+		Status: "1",
 	}
 
 	if CheckMemExist(freezeMem.Username, db); err != nil {
@@ -209,12 +209,13 @@ func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error)
 	user := User{}
 	userInfo := UserInfo{}
 
+	// 可以移除，因為下方有檢查『影響數量』
 	if CheckMemExist(deleteMem.Username, db); err != nil {
 		return err
 	}
 
 	tx := db.Begin()
-	execRes := tx.Model(&user).Where("username = ?", deleteMem.Username).Delete(&user)
+	execRes := tx.Model(&user).Where("users.username = ?", deleteMem.Username).Delete(&user)
 	if execRes.Error != nil {
 		tx.Rollback()
 		err = global.NewError{
@@ -256,5 +257,31 @@ func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error)
 
 // SQLEnableUserAccount 啟用會員帳號
 func SQLEnableUserAccount(enableMem *global.EnableUserAccountOption) (err error) {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	user := User{
+		Status: "0",
+	}
+
+	if CheckMemExist(enableMem.Username, db); err != nil {
+		return err
+	}
+
+	tx := db.Begin()
+
+	if err = tx.Model(&user).Where("username = ?", enableMem.Username).Update(&user).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when edit users table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+	tx.Commit()
+
 	return nil
 }

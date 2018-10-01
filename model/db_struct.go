@@ -18,7 +18,7 @@ type User struct {
 	// ID       int    `gorm:"column:id;primary_key;AUTO_INCREMENT;not null"`
 	Username string `gorm:"column:username;not null;unique;primary_key"`
 	Password string `gorm:"column:password;not null"`
-	Status   int    `gorm:"column:status;default:0"`
+	Status   string `gorm:"column:status;default:0"`
 	// CreatedAt time.Time `gorm:"column:createdat"`
 }
 
