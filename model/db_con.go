@@ -27,6 +27,7 @@ func dbConnect() (db *gorm.DB, err error) {
 		return nil, err
 	}
 
+	db.LogMode(true)
 	return db, nil
 }
 
@@ -145,7 +146,7 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 		return err
 	}
 
-	if err := tx.Model(&user).Where("username = ?", user.Username).Updates(&user).Error; err != nil {
+	if err := tx.Model(user).Where("username = ?", user.Username).Updates(user).Error; err != nil {
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when edit users table",
@@ -154,7 +155,7 @@ func SQLEditUserInfo(edUserInfo *global.EditUserInfoOption) (err error) {
 		return err
 	}
 
-	if err := tx.Model(&userInfo).Where("username = ?", userInfo.Username).Updates(&userInfo).Error; err != nil {
+	if err := tx.Model(userInfo).Where("username = ?", userInfo.Username).Updates(userInfo).Error; err != nil {
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when edit user_infos table",
@@ -185,7 +186,7 @@ func SQKFreezeUserAccount(freezeMem *global.FreezeUserAccountOption) (err error)
 
 	tx := db.Begin()
 
-	if err = tx.Model(&user).Where("username = ?", freezeMem.Username).Update(&user).Error; err != nil {
+	if err = tx.Model(user).Where("username = ?", freezeMem.Username).Update(user).Error; err != nil {
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when edit users table",
@@ -215,7 +216,7 @@ func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error)
 	}
 
 	tx := db.Begin()
-	execRes := tx.Model(&user).Where("users.username = ?", deleteMem.Username).Delete(&user)
+	execRes := tx.Model(user).Where("users.username = ?", deleteMem.Username).Delete(user)
 	if execRes.Error != nil {
 		tx.Rollback()
 		err = global.NewError{
@@ -224,29 +225,13 @@ func SQLDeleteUserAccount(deleteMem *global.DeleteUserAccountOption) (err error)
 		}
 		return err
 	}
-	if execRes.RowsAffected == 0 {
-		tx.Rollback()
-		err = global.NewError{
-			Title:   "data is not exist when delete users table",
-			Message: fmt.Sprintf("Affected rows is: %d", execRes.RowsAffected),
-		}
-		return err
-	}
 
-	execRes = tx.Model(&userInfo).Where("username = ?", deleteMem.Username).Delete(&userInfo)
+	execRes = tx.Model(userInfo).Where("username = ?", deleteMem.Username).Delete(userInfo)
 	if execRes.Error != nil {
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when delete user_infos table",
 			Message: fmt.Sprintf("Error massage is: %s", execRes.Error),
-		}
-		return err
-	}
-	if execRes.RowsAffected == 0 {
-		tx.Rollback()
-		err = global.NewError{
-			Title:   "data is not exist when delete user_infos table",
-			Message: fmt.Sprintf("Affected rows is: %d", execRes.RowsAffected),
 		}
 		return err
 	}
@@ -263,12 +248,7 @@ func SQLEnableUserAccount(enableMem *global.EnableUserAccountOption) (err error)
 	}
 	defer db.Close()
 
-	// user := User{
-	// 	Status: "0",
-	// }
-
-	user := map[string]int{}
-	user["status"] = 0
+	users := User{}
 
 	if CheckMemExist(enableMem.Username, db); err != nil {
 		return err
@@ -276,7 +256,7 @@ func SQLEnableUserAccount(enableMem *global.EnableUserAccountOption) (err error)
 
 	tx := db.Begin()
 
-	if err = tx.Model(&user).Where("username = ?", enableMem.Username).Update(&user).Error; err != nil {
+	if err = tx.Model(users).Where("username = ?", enableMem.Username).Update("status", 0).Error; err != nil {
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when edit users table",
