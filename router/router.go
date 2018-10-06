@@ -1,6 +1,7 @@
 package route
 
 import (
+	"GO_Admin/handler/file"
 	"GO_Admin/handler/member"
 
 	"github.com/gin-gonic/gin"
@@ -28,4 +29,6 @@ func SetupRouter(r *gin.Engine) {
 	// 啟用會員帳號
 	authorized.PUT("/enable_user_account", member.EnableUserAccount)
 
+	// 上傳檔案
+	authorized.POST("/upload_file", file.UploadFile)
 }

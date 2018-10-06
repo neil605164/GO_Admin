@@ -15,11 +15,9 @@ import "github.com/jinzhu/gorm"
 // 2. status: 0:啟用的帳號 1:凍結的帳號
 type User struct {
 	gorm.Model
-	// ID       int    `gorm:"column:id;primary_key;AUTO_INCREMENT;not null"`
 	Username string `gorm:"column:username;not null;unique;primary_key"`
 	Password string `gorm:"column:password;not null"`
 	Status   int    `gorm:"column:status;default:0"`
-	// CreatedAt time.Time `gorm:"column:createdat"`
 }
 
 // UserInfo 定義 userinfo model
@@ -27,10 +25,18 @@ type User struct {
 // 存放會員詳細資料
 type UserInfo struct {
 	gorm.Model
-	// ID       int    `gorm:"column:id;primary_key;AUTO_INCREMENT;not null"`
 	Username string `gorm:"column:username;not null;unique;primary_key"`
 	Nickname string `gorm:"column:nickname;"`
 	Email    string `gorm:"column:email;"`
 	Addr     string `gorm:"column:addr;"`
-	// CreatedAt time.Time `gorm:"column:createdat"`
+}
+
+// File 定義files table
+// 存放上傳檔案的詳細資料
+type File struct {
+	gorm.Model
+	FileName string `gorm:"column:file_name;not null"`
+	FilePath string `gorm:"column:file_path;not null"`
+	FileSize int64  `gorm:"column:file_size"`
+	FileExt  string `gorm:"column:file_ext"`
 }

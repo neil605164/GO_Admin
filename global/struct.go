@@ -1,6 +1,9 @@
 package global
 
-import "fmt"
+import (
+	"fmt"
+	"mime/multipart"
+)
 
 // DevConfig dev.yaml格式
 type DevConfig struct {
@@ -88,6 +91,21 @@ type EnableUserAccountOption struct {
 type EnableUserAccountResult struct {
 	Meta EnableUserAccountOption `json:"meta"`
 	Data interface{}             `json:"data"`
+}
+
+// UploadFileOption 上傳檔案時，帶入的參數
+type UploadFileOption struct {
+	File     *multipart.FileHeader
+	FileName string
+	FilePath string
+	FileSize int64
+	FileExt  string
+}
+
+// UploadFileResult 上傳檔案的回傳格式
+type UploadFileResult struct {
+	Meta *multipart.FileHeader `json:"meta"`
+	Data interface{}           `json:"data"`
 }
 
 // NewError 自行定義錯誤格式

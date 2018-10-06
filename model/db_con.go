@@ -48,6 +48,10 @@ func CheckTableIsExist() error {
 		db.AutoMigrate(&UserInfo{})
 	}
 
+	if !db.HasTable("files") {
+		db.AutoMigrate(&File{})
+	}
+
 	return nil
 }
 
@@ -260,6 +264,36 @@ func SQLEnableUserAccount(enableMem *global.EnableUserAccountOption) (err error)
 		tx.Rollback()
 		err = global.NewError{
 			Title:   "Unexpected error when edit users table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
+	tx.Commit()
+
+	return nil
+}
+
+// SQLUploadFile 上傳檔案
+func SQLUploadFile(fileInfo *global.UploadFileOption) error {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	file := File{
+		FileName: fileInfo.FileName,
+		FileSize: fileInfo.FileSize,
+		FilePath: fileInfo.FilePath,
+		FileExt:  fileInfo.FileExt,
+	}
+
+	tx := db.Begin()
+
+	if err := tx.Create(&file).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when insert file table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
