@@ -302,3 +302,37 @@ func SQLUploadFile(fileInfo *global.UploadFileOption) error {
 
 	return nil
 }
+
+// SQLUploadMultiFile 上傳多個檔案
+func SQLUploadMultiFile(fileInfo *global.UploadMultiFileOption) error {
+	db, err := dbConnect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	file := File{}
+	for i := 0; i < len(fileInfo.File); i++ {
+		file = File{
+			FileName: fileInfo.FileName[i],
+			FileSize: fileInfo.FileSize[i],
+			FilePath: fileInfo.FilePath,
+			FileExt:  fileInfo.FileExt[i],
+		}
+	}
+
+	fmt.Println(file)
+	// tx := db.Begin()
+
+	// if err := tx.Create(&file).Error; err != nil {
+	// 	tx.Rollback()
+	// 	err = global.NewError{
+	// 		Title:   "Unexpected error when insert file table",
+	// 		Message: fmt.Sprintf("Error massage is: %s", err),
+	// 	}
+	// 	return err
+	// }
+	// tx.Commit()
+
+	return nil
+}

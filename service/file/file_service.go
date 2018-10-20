@@ -44,7 +44,7 @@ func CheckAndMakeDir(path string) error {
 	return nil
 }
 
-// ComposeParams 組合上傳檔案參數
+// ComposeParams 組合上傳檔案參數(單一)
 func ComposeParams(c *gin.Context) (*global.UploadFileOption, error) {
 	uploadOption := &global.UploadFileOption{}
 	file, err := c.FormFile("file")
@@ -57,7 +57,7 @@ func ComposeParams(c *gin.Context) (*global.UploadFileOption, error) {
 	}
 
 	// 定義檔案路徑
-	filePath := "/home/hsieh/go/src/GO_Admin/File"
+	filePath := "./File"
 
 	uploadOption.File = file
 	uploadOption.FileName = global.Md5EncryptionWithTime(file.Filename)
@@ -84,6 +84,58 @@ func CreateFile(c *gin.Context, params *global.UploadFileOption) error {
 
 	// 存入資料庫
 	if err := model.SQLUploadFile(params); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ComposeMultiParams 組合上傳檔案參數(多張)
+func ComposeMultiParams(c *gin.Context) (*global.UploadMultiFileOption, error) {
+	UploadMultiFileOption := &global.UploadMultiFileOption{}
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		err = global.NewError{
+			Title:   "Unexpected error when upload file",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return UploadMultiFileOption, err
+	}
+
+	// 定義檔案路徑
+	filePath := "./File"
+
+	files := form.File["file"]
+	UploadMultiFileOption.File = files
+
+	for _, file := range files {
+		UploadMultiFileOption.FileName = append(UploadMultiFileOption.FileName, global.Md5EncryptionWithTime(file.Filename))
+		UploadMultiFileOption.FileSize = append(UploadMultiFileOption.FileSize, GetFileSize(file))
+		UploadMultiFileOption.FilePath = filePath
+		UploadMultiFileOption.FileExt = append(UploadMultiFileOption.FileExt, GetFileExt(file))
+	}
+
+	return UploadMultiFileOption, nil
+}
+
+func CreateMultiFile(c *gin.Context, params *global.UploadMultiFileOption) error {
+
+	for i := 0; i < len(params.FileName); i++ {
+		path := params.FilePath + "/" + params.FileName[i]
+
+		// 建立檔案
+		if err := c.SaveUploadedFile(params.File[i], path); err != nil {
+			err = global.NewError{
+				Title:   "Unexpected error when create new file",
+				Message: fmt.Sprintf("Error massage is: %s", err),
+			}
+			return err
+		}
+	}
+
+	// // 存入資料庫
+	if err := model.SQLUploadMultiFile(params); err != nil {
 		return err
 	}
 

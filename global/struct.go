@@ -108,6 +108,21 @@ type UploadFileResult struct {
 	Data interface{}           `json:"data"`
 }
 
+// UploadMultiFileOption 上傳多個檔案時，帶入的參數
+type UploadMultiFileOption struct {
+	File     []*multipart.FileHeader
+	FileName []string
+	FilePath string
+	FileSize []int64
+	FileExt  []string
+}
+
+// UploadMultiFileResult 上傳多個檔案的回傳格式
+type UploadMultiFileResult struct {
+	Meta []*multipart.FileHeader `json:"meta"`
+	Data interface{}             `json:"data"`
+}
+
 // NewError 自行定義錯誤格式
 type NewError struct {
 	Title   string

@@ -29,6 +29,8 @@ func SetupRouter(r *gin.Engine) {
 	// 啟用會員帳號
 	authorized.PUT("/enable_user_account", member.EnableUserAccount)
 
-	// 上傳檔案
+	// 上傳檔案(單一)
 	authorized.POST("/upload_file", file.UploadFile)
+	// 上傳檔案(多張)
+	authorized.POST("/upload_multifile", file.UploadMultiFile)
 }
