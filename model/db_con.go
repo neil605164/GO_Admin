@@ -3,6 +3,9 @@ package model
 import (
 	"GO_Admin/global"
 	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -311,28 +314,36 @@ func SQLUploadMultiFile(fileInfo *global.UploadMultiFileOption) error {
 	}
 	defer db.Close()
 
-	file := File{}
+	// 組query語法
+	var strArr []string
+	query := "INSERT INTO files (`created_at`, file_name`, `file_size`, `file_path`, `file_ext`) VALUES "
 	for i := 0; i < len(fileInfo.File); i++ {
-		file = File{
-			FileName: fileInfo.FileName[i],
-			FileSize: fileInfo.FileSize[i],
-			FilePath: fileInfo.FilePath,
-			FileExt:  fileInfo.FileExt[i],
-		}
+		now := time.Now()
+		strfileSize := strconv.FormatInt(fileInfo.FileSize[i], 10)
+		strArr = append(strArr, "('"+now+"','"+fileInfo.FileName[i]+"','"+strfileSize+"','"+fileInfo.FilePath+"','"+fileInfo.FileExt[i]+"')")
 	}
 
-	fmt.Println(file)
-	// tx := db.Begin()
+	newStr := strings.Join(strArr, ",")
+	query += newStr
 
+	tx := db.Begin()
+	if err := tx.Exec(query).Error; err != nil {
+		tx.Rollback()
+		err = global.NewError{
+			Title:   "Unexpected error when insert file table",
+			Message: fmt.Sprintf("Error massage is: %s", err),
+		}
+		return err
+	}
 	// if err := tx.Create(&file).Error; err != nil {
-	// 	tx.Rollback()
-	// 	err = global.NewError{
-	// 		Title:   "Unexpected error when insert file table",
-	// 		Message: fmt.Sprintf("Error massage is: %s", err),
-	// 	}
-	// 	return err
+	// tx.Rollback()
+	// err = global.NewError{
+	// 	Title:   "Unexpected error when insert file table",
+	// 	Message: fmt.Sprintf("Error massage is: %s", err),
 	// }
-	// tx.Commit()
+	// return err
+	// }
+	tx.Commit()
 
 	return nil
 }
