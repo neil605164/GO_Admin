@@ -3,6 +3,7 @@ package route
 import (
 	"GO_Admin/handler/file"
 	"GO_Admin/handler/member"
+	"GO_Admin/handler/pracinterface"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,4 +34,7 @@ func SetupRouter(r *gin.Engine) {
 	authorized.POST("/upload_file", file.UploadFile)
 	// 上傳檔案(多張)
 	authorized.POST("/upload_multifile", file.UploadMultiFile)
+
+	// 練習interface
+	authorized.GET("/prac_interface", pracInterface.InterfacePrac)
 }

@@ -316,11 +316,12 @@ func SQLUploadMultiFile(fileInfo *global.UploadMultiFileOption) error {
 
 	// 組query語法
 	var strArr []string
-	query := "INSERT INTO files (`created_at`, file_name`, `file_size`, `file_path`, `file_ext`) VALUES "
+	query := "INSERT INTO files (`created_at`, `file_name`, `file_size`, `file_path`, `file_ext`) VALUES "
 	for i := 0; i < len(fileInfo.File); i++ {
 		now := time.Now()
+
 		strfileSize := strconv.FormatInt(fileInfo.FileSize[i], 10)
-		strArr = append(strArr, "('"+now+"','"+fileInfo.FileName[i]+"','"+strfileSize+"','"+fileInfo.FilePath+"','"+fileInfo.FileExt[i]+"')")
+		strArr = append(strArr, "('"+now.Format("2006-01-02 15:04:05")+"','"+fileInfo.FileName[i]+"','"+strfileSize+"','"+fileInfo.FilePath+"','"+fileInfo.FileExt[i]+"')")
 	}
 
 	newStr := strings.Join(strArr, ",")
@@ -330,7 +331,7 @@ func SQLUploadMultiFile(fileInfo *global.UploadMultiFileOption) error {
 	if err := tx.Exec(query).Error; err != nil {
 		tx.Rollback()
 		err = global.NewError{
-			Title:   "Unexpected error when insert file table",
+			Title:   "Unexpected error when insert mutli file table",
 			Message: fmt.Sprintf("Error massage is: %s", err),
 		}
 		return err
