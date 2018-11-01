@@ -1,6 +1,7 @@
 package route
 
 import (
+	"GO_Admin/handler/auth"
 	"GO_Admin/handler/file"
 	"GO_Admin/handler/member"
 	"GO_Admin/handler/pracinterface"
@@ -10,6 +11,8 @@ import (
 
 // SetupRouter 路由控制
 func SetupRouter(r *gin.Engine) {
+
+	r.POST("/login", auth.Login)
 
 	// 登入驗證
 	authorized := r.Group("/", gin.BasicAuth(gin.Accounts{
