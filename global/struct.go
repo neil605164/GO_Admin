@@ -8,6 +8,7 @@ import (
 // DevConfig dev.yaml格式
 type DevConfig struct {
 	Database Dbconnect `yaml:"database"`
+	Redis    Redis     `yaml:"redis"`
 }
 
 // Dbconnect 載入dev的db環境設定
@@ -16,6 +17,12 @@ type Dbconnect struct {
 	Database string `yaml:"database"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
+}
+
+// Redis 載入dev的redis環境設定
+type Redis struct {
+	Host string `yaml:"host"`
+	Port string `yaml:"port"`
 }
 
 // RegisterMemberOption 呼叫「註冊會員」時，帶入的參數

@@ -27,6 +27,7 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
+
 }
 
 func getConfigData() (devConfig *DevConfig, err error) {

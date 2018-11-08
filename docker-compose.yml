@@ -4,6 +4,7 @@ services:
 
   goAdmindb:
     image: mysql:5.6
+    container_name: db
     # DB型別為utf8mb4 ...
     command: ['--character-set-server=utf8', '--collation-server=utf8_unicode_ci', --default-authentication-plugin=mysql_native_password]
     restart: always
@@ -16,6 +17,21 @@ services:
 
   adminer:
     image: adminer
+    container_name: adminer
     restart: always
     ports:
       - 8080:8080
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+    ports: 
+      - 6379:6379
+
+  redis-admin:
+    image: marian/rebrow
+    container_name: redis_admin
+    restart: always
+    ports: 
+      - 5001:5001

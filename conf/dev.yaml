@@ -3,3 +3,6 @@ database:
   database: GoAdmin
   user: root
   password: qwe1234
+redis:
+  host: localhost
+  port: 6379

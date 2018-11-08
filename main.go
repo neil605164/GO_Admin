@@ -22,6 +22,7 @@ func main() {
 
 	// 載入環境設定
 	global.Start()
+
 	// 檢查DB Table 是否存在
 	err := model.CheckTableIsExist()
 	if err != nil {
