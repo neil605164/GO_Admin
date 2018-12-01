@@ -5,13 +5,15 @@ import (
 	"GO_Admin/handler/file"
 	"GO_Admin/handler/member"
 	"GO_Admin/handler/pracinterface"
+	"GO_Admin/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 // SetupRouter 路由控制
 func SetupRouter(r *gin.Engine) {
-
+	// 全域middleware
+	r.Use(middleware.Printnumber)
 	r.POST("/login", auth.Login)
 
 	// 登入驗證
@@ -40,4 +42,5 @@ func SetupRouter(r *gin.Engine) {
 
 	// 練習interface
 	authorized.GET("/prac_interface", pracInterface.InterfacePrac)
+
 }

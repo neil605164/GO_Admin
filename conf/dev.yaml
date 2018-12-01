@@ -1,8 +1,8 @@
 database:
-  host: localhost
+  host: goAdmindb
   database: GoAdmin
   user: root
   password: qwe1234
 redis:
-  host: localhost
+  host: redis
   port: 6379

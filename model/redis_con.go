@@ -9,6 +9,7 @@ import (
 	Redis "github.com/gomodule/redigo/redis"
 )
 
+// redisConnect 與redis連線
 func redisConnect() (redis Redis.Conn, err error) {
 	// 使用redis封裝的Dial進行tcp連接
 	host := global.Config.Redis.Host
@@ -85,4 +86,24 @@ func Delete(key string) error {
 	}
 
 	return nil
+}
+
+// Append 在相同key新增多個值
+func Append(key string, value interface{}) (interface{}, error) {
+	r, err := redisConnect()
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	n, err := r.Do("APPEND", key, value)
+	if err != nil {
+		err = global.NewError{
+			Title:   "Redis select Fail",
+			Message: fmt.Sprintf("Error message is: %s", err),
+		}
+		return nil, err
+	}
+
+	return n, nil
 }

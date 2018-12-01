@@ -3,6 +3,8 @@ package auth
 import (
 	"net/http"
 
+	"GO_Admin/global"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,7 +24,7 @@ type LoginResult struct {
 func Login(c *gin.Context) {
 	l := &LoginOption{}
 	l.Username = c.PostForm("username")
-	l.Password = c.PostForm("password")
+	l.Password = global.Md5Encryption(c.PostForm("password"))
 
 	lr := &LoginResult{}
 	lr.Meta = l

@@ -3,6 +3,7 @@ package member
 import (
 	"GO_Admin/global"
 	"GO_Admin/model"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,6 +13,11 @@ import (
 // GetUserList 取得使用者清單
 func GetUserList(c *gin.Context) {
 	log.Println("=======Get User List Start=======:")
+	start, ok := c.Get("startTime")
+	if !ok {
+		fmt.Println("123")
+	}
+	fmt.Println(start)
 	// compose param start
 	getUserListResult := global.GetUserListResult{}
 
