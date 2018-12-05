@@ -1,5 +1,6 @@
 database:
   host: goAdmindb
+  # host: 127.0.0.1
   database: GoAdmin
   user: root
   password: qwe1234
